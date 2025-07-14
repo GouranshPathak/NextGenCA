@@ -10,6 +10,15 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
+app.get('/',(req,res)=>{
+  res.send(
+    {
+      activeStatus:true,
+      error:false,
+    }
+  )
+}
+)
 const appointmentRoutes = require("./routes/appointment");
 
 app.use("/api/appointments", appointmentRoutes);
