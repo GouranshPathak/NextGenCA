@@ -7,27 +7,31 @@ const cors = require("cors");
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-app.use(cors());
+// ✅ Allow only your frontend origin
+app.use(cors({
+  origin: "https://nextgenca.netlify.app",
+  methods: ["GET", "POST"],
+  credentials: true
+}));
+
 app.use(express.json());
 
-app.get('/',(req,res)=>{
-  res.send(
-    {
-      activeStatus:true,
-      error:false,
-    }
-  )
-}
-)
-const appointmentRoutes = require("./routes/appointment");
+// ✅ Root route to check status
+app.get('/', (req, res) => {
+  res.send({
+    activeStatus: true,
+    error: false,
+  });
+});
 
+// ✅ Routes
+const appointmentRoutes = require("./routes/appointment");
 app.use("/api/appointments", appointmentRoutes);
 
 const messageRoutes = require("./routes/message");
-
 app.use("/api/message", messageRoutes);
 
-// MongoDB connection
+// ✅ MongoDB connection
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -37,7 +41,7 @@ mongoose.connect(process.env.MONGO_URI, {
   console.error("❌ MongoDB connection failed:", err);
 });
 
-// Schema
+// ✅ Mongoose Schema for leads
 const leadSchema = new mongoose.Schema({
   name: String,
   email: String,
@@ -49,7 +53,7 @@ const leadSchema = new mongoose.Schema({
 });
 const Lead = mongoose.model("Lead", leadSchema);
 
-// Email transport
+// ✅ Nodemailer setup
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -58,7 +62,7 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-// Leads route
+// ✅ Leads submission route
 app.post("/api/leads", async (req, res) => {
   const { name, email, phone, message, service, source } = req.body;
 
@@ -82,6 +86,7 @@ app.post("/api/leads", async (req, res) => {
   }
 });
 
+// ✅ Start server
 app.listen(PORT, () => {
   console.log(`🚀 Server listening on http://localhost:${PORT}`);
 });
